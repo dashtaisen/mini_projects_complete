@@ -13,12 +13,6 @@ business_path = './yelp_academic_dataset_business.json'
 #list of reviews, can search for ID, but not for category
 review_path = './yelp_academic_dataset_review.json'
 
-#where to save the hospital reviews
-dest_path="./hospital_reviews.json"
-
-#sample business ID for a quick debugging search
-sample_id = "nC3dqEhsSXx4V0rTb2dpuA"
-
 class YelpParser:
     def __init__(self, source_path):
         self.source = source_path
