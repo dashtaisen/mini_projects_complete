@@ -7,11 +7,14 @@ Bugs: Parsing the reviews file is very slow; optimization needed
 import json
 import pickle
 
-#list of businesses, includes tag for category
-business_path = './yelp_academic_dataset_business.json'
+#replace this with the directory of your business JSON file
 
-#list of reviews, can search for ID, but not for category
-review_path = './yelp_academic_dataset_review.json'
+yelp_path = '../../yelp/yelp_dataset_challenge_round9/'
+
+business_path = yelp_path + 'yelp_academic_dataset_business.json'
+
+#replace this with the directory of your review JSON file
+review_path = yelp_path + 'yelp_academic_dataset_review.json'
 
 class YelpParser:
     def __init__(self, source_path):
@@ -39,16 +42,17 @@ class BusinessParser(YelpParser):
                             matches.append(line)
         return matches
     
-    def get_category_list(self):
-        """Return list of all categories in the JSON"""
-        #Output: a list of all the categories appearing in the dataset
-        category_list = []
+    def get_categories(self):
+        """Return dict of all categories in the JSON, with their counts"""
+        #Output: a dict of all the categories appearing in the dataset
+        category_dict = {}
         with open(self.source) as f:
             while f.readline():
                 line = f.readline()
                 if json.loads(line)['categories']:
-                    category_list.extend(json.loads(line)['categories'])
-        return category_list 
+                    for category in json.loads(line)['categories']:
+                        category_dict[category] = category_dict.get(category, 0) + 1
+        return category_dict 
 
     def get_ids_for_category(self,  match_string):
         """Return list of all IDs of business having category matching match_string"""
@@ -104,9 +108,9 @@ def parser_demo(query):
     #We'll use this to find IDs matching the user's queried category
     bp = BusinessParser(business_path)
 
-    #Get list of all categories, just for fun
-    categories = bp.get_category_list()
-    print("Found {0} categories".format(len(categories)))
+    #Find out how many categories there are, just for fun
+    categories = bp.get_categories()
+    print("Found {0} categories".format(len(categories.keys())))
 
     #Get categories matching the user's query
     matching_categories = bp.find_matching_categories(query)
