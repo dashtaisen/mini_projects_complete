@@ -145,4 +145,4 @@ def parser_demo(query):
     return mr_data
 
 if __name__ == '__main__':
-    parser_demo('Financial Services')
+    parser_demo('Travel')
