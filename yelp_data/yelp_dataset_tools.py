@@ -33,8 +33,7 @@ class BusinessParser(YelpParser):
         
         matches = []
         with open(self.source) as f:
-            while f.readline():
-                line = f.readline()
+            for line in f:
                 cats = json.loads(line)['categories']
                 if cats:
                     for cat in cats: 
@@ -47,8 +46,7 @@ class BusinessParser(YelpParser):
         #Output: a dict of all the categories appearing in the dataset
         category_dict = {}
         with open(self.source) as f:
-            while f.readline():
-                line = f.readline()
+            for line in f:
                 if json.loads(line)['categories']:
                     for category in json.loads(line)['categories']:
                         category_dict[category] = category_dict.get(category, 0) + 1
@@ -83,8 +81,8 @@ class ReviewParser(YelpParser):
         #output list reviews for given IDs, each as JSON object
         reviews = []
         with open(self.source) as f:
-             while f.readline():
-                 line_data = json.loads(f.readline())
+             for line in f:
+                 line_data = json.loads(line)
                  if line_data['business_id']:
                      if line_data['business_id'] in ids:
                          reviews.append(line_data)
@@ -130,9 +128,9 @@ def parser_demo(query):
     print("Found {0} reviews for {1} businesses".format(len(matching_reviews), query))
 
     #Pickle the reviews so they're easier to retrieve later
-    pickle_path = query.lower().replace(' ', '_') + '_reviews.pickle'
-    rp.pickle_reviews(matching_reviews, pickle_path)
-    print("Pickled reviews to {0}".format(pickle_path))
+    #pickle_path = query.lower().replace(' ', '_') + '_reviews.pickle'
+    #rp.pickle_reviews(matching_reviews, pickle_path)
+    #print("Pickled reviews to {0}".format(pickle_path))
 
     #Save the reviews to a JSON file
     json_path = query.lower().replace(' ', '_') + '_reviews.json'
@@ -140,9 +138,9 @@ def parser_demo(query):
     print("Wrote {0} reviews to {0}".format(query, json_path))
 
     #Create a JSON data object that we can play with
-    mr = ReviewParser(json_path)
-    mr_data = mr.get_data_from_json()
-    return mr_data
+    #mr = ReviewParser(json_path)
+    #mr_data = mr.get_data_from_json()
+    #return mr_data
 
 if __name__ == '__main__':
-    parser_demo('Travel')
+    parser_demo('Hospitals')
