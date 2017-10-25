@@ -30,17 +30,17 @@ class BusinessParser(YelpParser):
         #input: list of lines of Yelp business info, each a JSON object
         #Note: I did readlines() instead of json.load because it's quite large
         #output: list of JSON lines that include 'match' in category attribute
-        
+
         matches = []
         with open(self.source) as f:
             for line in f:
                 cats = json.loads(line)['categories']
                 if cats:
-                    for cat in cats: 
+                    for cat in cats:
                         if match_string in cat:
                             matches.append(line)
         return matches
-    
+
     def get_categories(self):
         """Return dict of all categories in the JSON, with their counts"""
         #Output: a dict of all the categories appearing in the dataset
@@ -50,7 +50,7 @@ class BusinessParser(YelpParser):
                 if json.loads(line)['categories']:
                     for category in json.loads(line)['categories']:
                         category_dict[category] = category_dict.get(category, 0) + 1
-        return category_dict 
+        return category_dict
 
     def get_ids_for_category(self,  match_string):
         """Return list of all IDs of business having category matching match_string"""
@@ -59,7 +59,7 @@ class BusinessParser(YelpParser):
         #note: we use this to search the reviews later
         matches = self.find_matching_categories(match_string)
         return [json.loads(match)['business_id'] for match in matches]
-         
+
 
 class ReviewParser(YelpParser):
     """Class for working with JSON of yelp reviews"""
@@ -72,12 +72,12 @@ class ReviewParser(YelpParser):
         #Output: JSON object
         #We don't use loads() because it's dumped as json, not string
         with open(self.source) as f:
-            data = json.load(f)        
+            data = json.load(f)
         return data
 
     def get_reviews_by_ids(self, ids):
         """Get reviews matching given IDs"""
-        #Input: business IDS    
+        #Input: business IDS
         #output list reviews for given IDs, each as JSON object
         reviews = []
         with open(self.source) as f:
@@ -118,7 +118,7 @@ def parser_demo(query):
     #We'll need these when searching the reviews
     matching_ids = bp.get_ids_for_category(query)
     print("Got ids for {0}".format(query))
-    
+
     #Create ReviewParser object
     #We'll use this to search the reviews
     rp = ReviewParser(review_path)
