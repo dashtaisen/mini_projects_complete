@@ -1,4 +1,6 @@
 """
+Tool for calculating inter-annotator agreement on yelp reviews
+
 @author Nicholas Miller
 
 Input: A .csv file of each user's annotations.
@@ -32,13 +34,9 @@ def get_annotation_dicts(csv_source):
         csv_source: path to source csv file
     Returns:
         tag_dict: a dict of the form {(file, ant): (set of tags)}
-        facet_dict: a dict of the form {(file, ant): (set of facets)}
-        sentiment_dict: a dict of the form {(file, ant): (set of sentiments)}
     """
     with codecs.open(csv_source, encoding='utf-8', errors='replace') as source:
         tag_dict = dict() #{(file, ant): set()}
-        facet_dict = dict() #{(file, ant): set()}
-        sentiment_dict = dict() #{(file, ant): set()}
 
         reader = csv.DictReader(source)
         #reader.next() #skip header
@@ -47,35 +45,22 @@ def get_annotation_dicts(csv_source):
             filename = row['File']
             ant = row['Ant']
             tag = row['Tag']
-            facet = row['Facet']
-            sentiment = row['Sentiment']
-
 
             #Skip metadata, since we're assuming annotators will agree on that
-            if tag and tag != 'METADATA':
+            if tag is not None and tag != 'METADATA':
                 #Dictionary keys are (filename, annotator)
                 #Dictionary values are {set of tags}
                 try:
                     tag_dict[(filename, ant)].add(tag)
-                    facet_dict[(filename, ant)].add(facet)
-                    sentiment_dict[(filename, ant)].add(sentiment)
                 except KeyError:
                     tag_dict[(filename,ant)] = set()
-                    facet_dict[(filename,ant)] = set()
-                    sentiment_dict[(filename,ant)] = set()
                     tag_dict[(filename, ant)].add(tag)
-                    facet_dict[(filename, ant)].add(facet)
-                    sentiment_dict[(filename, ant)].add(sentiment)
 
         #Convert to frozenset since masi distance needs immutable
         for key in tag_dict.keys():
             tag_dict[key] = frozenset(tag_dict[key])
-        for key in facet_dict.keys():
-            facet_dict[key] = frozenset(facet_dict[key])
-        for key in sentiment_dict.keys():
-            sentiment_dict[key] = frozenset(sentiment_dict[key])
 
-    return tag_dict, facet_dict, sentiment_dict
+    return tag_dict
 
 def create_annotation_task(tag_dict):
     """Creates an AnnotationTask object and loads it with data from the given
@@ -153,10 +138,8 @@ if __name__ == '__main__':
         print_agreement = args.agreement
 
     source_path = args.source
-    tag_dict, facet_dict, sentiment_dict = get_annotation_dicts(source_path)
+    tag_dict = get_annotation_dicts(source_path)
     tag_task = create_annotation_task(tag_dict)
-    facet_task = create_annotation_task(facet_dict)
-    sentiment_task = create_annotation_task(sentiment_dict)
     #Find missing tags
     missing = list()
     for filename in tag_task.I:
@@ -165,14 +148,10 @@ if __name__ == '__main__':
                 missing.append((filename, ant))
                 print("Filling in default value for ({}, {})".format(filename, ant))
                 tag_dict[(filename, ant)] = (frozenset(['NONE']))
-                facet_dict[(filename, ant)] = (frozenset(['NONE']))
-                sentiment_dict[(filename, ant)] = (frozenset(['NONE']))
     tag_task = create_annotation_task(tag_dict)
-    facet_task = create_annotation_task(facet_dict)
-    sentiment_task = create_annotation_task(sentiment_dict)
     print("\n")
 
-    tasks = {'tag': tag_task, 'facet': facet_task, 'sentiment': sentiment_task}
+    tasks = {'tag': tag_task}
     for task in tasks.keys():
         if print_counts:
             print("{} counts for all annotators:".format(task))
