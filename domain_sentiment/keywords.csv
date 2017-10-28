@@ -1,5 +1,0 @@
-Word,List,Domain,Sentiment
-improvement_needed,whitelist,general,negative
-excellent,whitelist,general,positive
-penmanship,whitelist,misc,neutral
-reasoning,whitelist,reasoning,neutral
