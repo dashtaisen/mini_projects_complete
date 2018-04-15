@@ -1,5 +1,4 @@
 Word,Cat
-able,v
 bring,v
 buy,v
 come,v
@@ -9,7 +8,6 @@ eat,v
 get,v
 give,v
 go,v
-have_to,v
 hear,v
 know,v
 like,v
@@ -20,7 +18,6 @@ see,v
 take,v
 think,v
 use,v
-want,v
 write,v
 read,v
 because,m

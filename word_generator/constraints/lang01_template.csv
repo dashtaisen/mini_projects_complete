@@ -130,6 +130,9 @@ v_mood_desire,fain
 v_mood_evidential,
 v_mood_subjunctive,seur
 v_mood_imperative,kiul
+v_mood_necessity,
+v_mood_obligation,
+v_neg,kau
 v_mood_jussive,
 v_mood_interogative,
 v_mood_optative,

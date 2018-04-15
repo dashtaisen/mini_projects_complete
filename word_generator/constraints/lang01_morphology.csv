@@ -30,6 +30,8 @@ v_mood_imperative,1
 v_mood_ability,1
 v_mood_desire,1
 v_mood_evidential,1
+v_mood_necessity,1
+v_mood_obligation,1
 v_mood_jussive,1
 v_mood_interogative,1
 v_mood_optative,1
@@ -45,6 +47,7 @@ v_att_certain,1
 v_att_uncertain,1
 v_val_pass,1
 v_val_caus,1
+v_neg,1
 a_comp,1
 a_sup,1
 a_dim,1
