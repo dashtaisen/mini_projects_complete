@@ -150,7 +150,7 @@ def write_language_template(defs_words_tags, defs_and_morphemes,dest_fname):
         for definition, morpheme in defs_and_morphemes:
             dest.write("{},{}\n".format(definition,morpheme))
 
-def apply_morphology(word,pos,defs_and_morphemes):
+def apply_morphology(word,word_def,pos,defs_and_morphemes):
     """Apply morphology to word"""
     word_conj = ""
     gloss = []
@@ -166,6 +166,7 @@ def apply_morphology(word,pos,defs_and_morphemes):
         prefix_def, noun_prefix = random.choice(n_prefixes)
         suffix_def, noun_suffix = random.choice(n_suffixes)
         gloss.append(prefix_def)
+        gloss.append(word_def)
         gloss.append(suffix_def)
 
         word_conj = "{}-{}-{}".format(noun_prefix,word,noun_suffix)
@@ -190,7 +191,8 @@ def apply_morphology(word,pos,defs_and_morphemes):
         suffix_def, v_suffix = random.choice(other_v_suffix)
 
         word_conj = "{}-{}-{}-{}".format(v_agr,v_aspect,word,v_tense,v_suffix)
-        gloss.extend([agr_def, aspect_def, tense_def, suffix_def])
+        gloss.extend([agr_def.replace("agr_",""), aspect_def.replace("aspect_",""),
+            word_def, tense_def.replace("tense_",""), suffix_def.split("_")[-1]])
 
     elif pos == "a":
         adj_morphemes = [
@@ -199,6 +201,7 @@ def apply_morphology(word,pos,defs_and_morphemes):
         ]
         suffix_def, adj_suffix = random.choice(adj_morphemes)
         word_conj = "{}-{}".format(word,adj_suffix)
+        gloss.append(word_def)
         gloss.append(suffix_def)
     else:
         word_conj = word
@@ -261,18 +264,18 @@ def create_real_text(lang_template,num_sents=10):
         verb_word = verb[1].replace("v_","")
         verb_tag = verb[2]
 
-        obj_conj,gloss = apply_morphology(obj_word,obj_tag,defs_and_morphemes)
+        obj_conj,gloss = apply_morphology(obj_word,obj_def,obj_tag,defs_and_morphemes)
         obj_gloss = "-".join([item for item in gloss])
 
-        adj_conj,gloss = apply_morphology(adj_word,adj_tag,defs_and_morphemes)
+        adj_conj,gloss = apply_morphology(adj_word,adj_def,adj_tag,defs_and_morphemes)
         adj_gloss = "-".join([item for item in gloss])
 
-        verb_conj,gloss = apply_morphology(verb_word,verb_tag,defs_and_morphemes)
+        verb_conj,gloss = apply_morphology(verb_word,verb_def,verb_tag,defs_and_morphemes)
         verb_gloss = "-".join([item for item in gloss])
 
-        verb_def_gloss = verb_def + "-" + verb_gloss.replace("v_","")
-        adj_def_gloss = adj_def + "-" + adj_gloss.replace("a_","")
-        obj_def_gloss = obj_def + "-" + obj_gloss.replace("n_","")
+        verb_def_gloss = verb_gloss.replace("v_","")
+        adj_def_gloss = adj_gloss.replace("a_","")
+        obj_def_gloss = obj_gloss.replace("n_","")
 
         current_sent = [verb_conj, obj_conj, adj_conj]
         current_translation = [verb_def_gloss, adj_def_gloss, obj_def_gloss]
