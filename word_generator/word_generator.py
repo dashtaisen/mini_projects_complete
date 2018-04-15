@@ -191,6 +191,14 @@ def create_morphemes(defs_and_words, phon_csv,morph_csv,max_syls=1):
         defs_and_morphemes.append((morph_meaning,morpheme))
     return defs_and_morphemes
 
+def write_language_template(defs_and_words, defs_and_morphemes,dest_fname):
+    with open(dest_fname,'w') as dest:
+        dest.write("Meaning,Word\n")
+        for definition, word in defs_and_words:
+            dest.write("w_{},{}\n".format(definition,word))
+        for definition, morpheme in defs_and_morphemes:
+            dest.write("{},{}\n".format(definition,morpheme))
+
 def apply_morphology(word,pos,defs_and_morphemes):
     """Apply morphology to word"""
     word_conj = ""
@@ -248,10 +256,18 @@ def random_little_word(little_word_proportion):
         little_word_choice = random.choice(LITTLE_WORDS)
     return little_word_choice
 
-def create_fake_text(defs_and_words,defs_and_morphemes,num_sents=10,max_sent_length=8,little_word_proportion=3):
+def create_fake_text(lang_template,num_sents=10,max_sent_length=8,little_word_proportion=3):
     """Create a fake text with no meaning"""
     text = list() # The created text
-    words = [word for definition, word in defs_and_words]
+    words = list()
+    defs_and_morphemes = list()
+    with open(lang_template) as source:
+        reader = csv.DictReader(source)
+        for row in reader:
+            if row["Meaning"].startswith("w_"):
+                words.append(row["Word"])
+            else:
+                defs_and_morphemes.append((row["Meaning"],row["Word"]))
     for sent_count in range(num_sents):
         current_sent = list()
         first_word = random.choice(words)
@@ -282,7 +298,8 @@ def create_fake_text(defs_and_words,defs_and_morphemes,num_sents=10,max_sent_len
     return " ".join(text)
 
 if __name__ == "__main__":
-    for lang_name, max_syl in [("lang01",3),("lang02",3),("lang03",1),("lang04",4)]:
+    """
+    for lang_name, max_syl in [("lang01",3)]:#("lang02",3),("lang03",1),("lang04",4)]:
         print("Creating language from {} template".format(lang_name))
         phon_csv = "{}_phonology.csv".format(lang_name)
         morph_csv = "{}_morphology.csv".format(lang_name)
@@ -298,8 +315,15 @@ if __name__ == "__main__":
         for definition, morpheme in defs_and_morphemes:
             print("{}: {}".format(definition, morpheme))
         print()
+    """
 
-        print("Creating sample text:")
-        fake_text = create_fake_text(defs_and_words,defs_and_morphemes)
-        print(fake_text)
-        print()
+    """
+    print("Writing language template:")
+    template_fname = os.path.join(CONSTRAINTS_DIR,"{}_template.csv".format(lang_name))
+    write_language_template(defs_and_words,defs_and_morphemes,template_fname)
+    """
+
+    print("Creating sample text:")
+    fake_text = create_fake_text(os.path.join(CONSTRAINTS_DIR,"lang01_template.csv"))
+    print(fake_text)
+    print()
