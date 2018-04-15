@@ -207,6 +207,67 @@ def random_little_word(little_word_proportion):
         little_word_choice = random.choice(LITTLE_WORDS)
     return little_word_choice
 
+def create_real_text(lang_template,num_sents=10):
+    text = list() # The created text
+    translation = list()
+    words = list()
+    defs_and_morphemes = list()
+    with open(lang_template) as source:
+        reader = csv.DictReader(source)
+        for row in reader:
+            if row["Meaning"].startswith("w_"):
+                words.append((row["Meaning"],row["Word"],row["Tag"]))
+            else:
+                defs_and_morphemes.append((row["Meaning"],row["Word"]))
+    nouns = [
+        word for word in words if word[2] == "n"
+    ]
+
+    verbs = [
+        word for word in words if word[2] == "v"
+    ]
+
+    adjectives = [
+        word for word in words if word[2] == "a"
+    ]
+
+    misc_words = [
+        word for word in words if word[2] == "m"
+    ]
+
+
+    for sent_count in range(num_sents):
+        current_sent = list()
+        obj = random.choice(nouns)
+        obj_def = obj[0].replace("w_","")
+        obj_word = obj[1]
+        obj_tag = obj[2]
+
+        adj = random.choice(adjectives)
+        adj_def = adj[0].replace("w_","")
+        adj_word = adj[1]
+        adj_tag = adj[2]
+
+        verb = random.choice(verbs)
+        verb_def = verb[0].replace("w_","")
+        verb_word = verb[1]
+        verb_tag = verb[2]
+
+        obj_conj = apply_morphology(obj_word,obj_tag,defs_and_morphemes)
+        adj_conj = apply_morphology(adj_word,adj_tag,defs_and_morphemes)
+        verb_conj = apply_morphology(verb_word,verb_tag,defs_and_morphemes)
+
+        current_sent = [verb_conj, obj_conj, adj_conj]
+        current_translation = [verb_def, adj_def, obj_def]
+        text.extend(current_sent)
+        translation.extend(current_translation)
+        punct = random.choice(PUNCTUATION)
+        text.append(punct)
+        translation.append(punct)
+
+    return " ".join(text), " ".join(translation)
+
+
 def create_fake_text(lang_template,num_sents=10,max_sent_length=8,little_word_proportion=3):
     """Create a fake text with no meaning"""
     text = list() # The created text
@@ -273,6 +334,11 @@ if __name__ == "__main__":
 
 
     print("Creating sample text:")
-    fake_text = create_fake_text(os.path.join(CONSTRAINTS_DIR,"lang01_template.csv"))
-    print(fake_text)
+    #fake_text = create_fake_text(os.path.join(CONSTRAINTS_DIR,"lang01_template.csv"))
+    #print(fake_text)
+    #print()
+
+    text, trans = create_real_text(template_fname)
+    print(text)
     print()
+    print(trans)
