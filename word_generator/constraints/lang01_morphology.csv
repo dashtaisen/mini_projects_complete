@@ -52,12 +52,12 @@ a_comp,1
 a_sup,1
 a_dim,0
 a_aug,0
-n_to_verb,1
-n_to_adj,1
+n_to_verb,0
+n_to_adj,0
 v_to_noun,1
 v_to_adj,1
-a_to_noun,1
-a_to_verb,1
+a_to_noun,0
+a_to_verb,0
 v_reported_speech,1
 prep_time_at,1
 prep_time_before,1

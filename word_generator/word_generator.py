@@ -163,13 +163,21 @@ def apply_morphology(word,word_def,pos,defs_and_morphemes):
             (definition, morpheme) for definition, morpheme in defs_and_morphemes
             if definition.startswith("n_")
         ]
-        prefix_def, noun_prefix = random.choice(n_prefixes)
+        preposition_likelihood = random.random()
+        if preposition_likelihood > .8:
+            prefix_def, noun_prefix = random.choice(n_prefixes)
+        else:
+            prefix_def, noun_prefix = (None, None)
         suffix_def, noun_suffix = random.choice(n_suffixes)
-        gloss.append(prefix_def)
-        gloss.append(word_def)
-        gloss.append(suffix_def)
-
-        word_conj = "{}-{}-{}".format(noun_prefix,word,noun_suffix)
+        if prefix_def is not None:
+            gloss.append(prefix_def)
+            gloss.append(word_def)
+            gloss.append(suffix_def)
+            word_conj = "{}-{}-{}".format(noun_prefix,word,noun_suffix)
+        else:
+            gloss.append(word_def)
+            gloss.append(suffix_def)
+            word_conj = "{}-{}".format(word,noun_suffix)
 
     elif pos == "v":
         verb_morphemes = [
