@@ -27,6 +27,9 @@ v_aspect_experience,1
 v_mood_indicative,1
 v_mood_subjunctive,1
 v_mood_imperative,1
+v_mood_ability,1
+v_mood_desire,1
+v_mood_evidential,1
 v_mood_jussive,1
 v_mood_interogative,1
 v_mood_optative,1

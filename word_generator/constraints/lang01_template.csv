@@ -125,6 +125,9 @@ v_aspect_continuous,t
 v_aspect_complete,s
 v_aspect_experience,j
 v_mood_indicative,
+v_mood_ability,beil
+v_mood_desire,fain
+v_mood_evidential,
 v_mood_subjunctive,seur
 v_mood_imperative,kiul
 v_mood_jussive,
@@ -133,8 +136,8 @@ v_mood_optative,
 v_att_malicious_intent,
 v_att_riddance,
 v_att_disgust,
-v_att_selfbenefit,beil
-v_att_otherbenefit,fain
+v_att_selfbenefit,
+v_att_otherbenefit,
 v_att_unexpected,
 v_att_expected,
 v_att_evidential,

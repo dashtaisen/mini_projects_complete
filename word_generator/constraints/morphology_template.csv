@@ -24,6 +24,9 @@ v_aspect_habit,0
 v_aspect_continuous,0
 v_aspect_complete,0
 v_aspect_experience,0
+v_mood_ability,0
+v_mood_desire,0
+v_mood_evidential,0
 v_mood_indicative,0
 v_mood_subjunctive,0
 v_mood_imperative,0
