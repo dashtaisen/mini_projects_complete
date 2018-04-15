@@ -12,14 +12,8 @@ CONSTRAINTS_DIR = os.path.join(os.curdir,"constraints")
 # We're not worried about specific words yet, so just have indices for now
 # TODO: load this from csv
 DEFINITION_LIST = range(100)
+WORD_LIST_FNAME = os.path.join(CONSTRAINTS_DIR, "basic_word_list.csv")
 # WORD_LIST = []
-
-# This could be strings or functions
-# TODO: load this from csv
-MORPHEME_LIST = [
-
-
-]
 
 # Parts of speech
 # TODO: load all these from csv
@@ -29,62 +23,12 @@ POS = [
     "adjective",
 ]
 
-NOUN_PREFIXES = [
-    ""
-]
-
-NOUN_SUFFIXES = [
-    "ai",
-    "in",
-    "sim",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    ""
-]
-
-VERB_PREFIXES = [
-    ""
-]
-
-VERB_SUFFIXES = [
-    "ar",
-    "al",
-    "ir",
-    "il",
-    "or",
-    "ol",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-]
-
-ADJ_PREFIXES = [
-    ""
-]
-
-ADJ_SUFFIXES = [
-    ""
-]
-
 # function words, here used just for effect rather than for meaning
 LITTLE_WORDS = [
 "go","an","wa","so","te","heo"
 ]
 
-PUNCTUATION = [
-    ".",
-    ",",
-    "?",
-    "!"
-]
+PUNCTUATION = [".",",","!","?"]
 
 def load_phon_template(phon_csv):
     """Load phonology from csv"""
@@ -106,11 +50,11 @@ def load_phon_template(phon_csv):
 def lenite(word):
     pass
 
-def create_words(phon_csv,max_syls = 4):
+def create_words(phon_csv,wordlist_fname,max_syls = 4):
     """Make words within constraints specified above"""
     initials, medials, finals = load_phon_template(phon_csv)
-    created_words = set() # list of words
-    defs_and_words = set() # list of (definition,word)
+    created_words = list() # list of words
+    defs_words_tags = list() # list of (definition,word)
     # To ensure some variety, keep track of the prev word
     prev_initial = ""
     prev_medial = ""
@@ -119,7 +63,14 @@ def create_words(phon_csv,max_syls = 4):
     cur_medial = ""
     cur_final = ""
 
-    for definition in DEFINITION_LIST:
+    defs_and_tags = list()
+
+    with open(wordlist_fname) as source:
+        reader = csv.DictReader(source)
+        for row in reader:
+            defs_and_tags.append((row["Word"],row["POS"]))
+
+    for definition,tag in defs_and_tags:
         word = None
         current_word_parts = list()
         while word is None or word in created_words:
@@ -140,11 +91,11 @@ def create_words(phon_csv,max_syls = 4):
                 prev_final = cur_final
                 current_word_parts.append(cur_final)
             word = "".join(current_word_parts)
-        created_words.add(word)
-        defs_and_words.add((definition,word))
-    return defs_and_words
+        created_words.append(word)
+        defs_words_tags.append((definition,word,tag))
+    return defs_words_tags
 
-def create_morphemes(defs_and_words, phon_csv,morph_csv,max_syls=1):
+def create_morphemes(defs_words_tags, phon_csv,morph_csv,max_syls=1):
     """Create morphemes"""
     morphemes = list() # list of morphemes
     defs_and_morphemes = list() # list of (meaning,morpheme) tuples
@@ -156,7 +107,7 @@ def create_morphemes(defs_and_words, phon_csv,morph_csv,max_syls=1):
         for row in reader:
             if int(row['in_lang']) == 1:
                 morph_meanings.append(row['morpheme'])
-    existing_words = [word for definition, word in defs_and_words]
+    existing_words = [word for definition, word,tag in defs_words_tags]
 
     # To ensure some variety, keep track of the prev word
     prev_initial = ""
@@ -191,18 +142,18 @@ def create_morphemes(defs_and_words, phon_csv,morph_csv,max_syls=1):
         defs_and_morphemes.append((morph_meaning,morpheme))
     return defs_and_morphemes
 
-def write_language_template(defs_and_words, defs_and_morphemes,dest_fname):
+def write_language_template(defs_words_tags, defs_and_morphemes,dest_fname):
     with open(dest_fname,'w') as dest:
-        dest.write("Meaning,Word\n")
-        for definition, word in defs_and_words:
-            dest.write("w_{},{}\n".format(definition,word))
+        dest.write("Meaning,Word,Tag\n")
+        for definition, word, tag in defs_words_tags:
+            dest.write("w_{},{},{}\n".format(definition,word,tag))
         for definition, morpheme in defs_and_morphemes:
             dest.write("{},{}\n".format(definition,morpheme))
 
 def apply_morphology(word,pos,defs_and_morphemes):
     """Apply morphology to word"""
     word_conj = ""
-    if pos == "noun":
+    if pos == "n":
         n_prefixes = [
             morpheme for definition, morpheme in defs_and_morphemes
             if definition.startswith("prep_")
@@ -215,7 +166,7 @@ def apply_morphology(word,pos,defs_and_morphemes):
         noun_suffix = random.choice(n_suffixes)
         word_conj = "{}-{}-{}".format(noun_prefix,word,noun_suffix)
 
-    elif pos == "verb":
+    elif pos == "v":
         verb_morphemes = [
             (definition, morpheme) for definition, morpheme in defs_and_morphemes
             if definition.startswith("v_")
@@ -235,7 +186,7 @@ def apply_morphology(word,pos,defs_and_morphemes):
         v_suffix = random.choice(other_v_suffix)
         word_conj = "{}-{}-{}-{}".format(v_agr,v_aspect,word,v_tense,v_suffix)
 
-    elif pos == "adjective":
+    elif pos == "a":
         adj_morphemes = [
             morpheme for definition, morpheme in defs_and_morphemes
             if definition.startswith("a_")
@@ -265,13 +216,12 @@ def create_fake_text(lang_template,num_sents=10,max_sent_length=8,little_word_pr
         reader = csv.DictReader(source)
         for row in reader:
             if row["Meaning"].startswith("w_"):
-                words.append(row["Word"])
+                words.append((row["Word"],row["Tag"]))
             else:
                 defs_and_morphemes.append((row["Meaning"],row["Word"]))
     for sent_count in range(num_sents):
         current_sent = list()
-        first_word = random.choice(words)
-        first_pos = random.choice(POS)
+        first_word,first_pos = random.choice(words)
         first_word_conj = apply_morphology(first_word,first_pos,defs_and_morphemes)
         prev_word = first_word
         prev_pos = first_pos
@@ -283,9 +233,7 @@ def create_fake_text(lang_template,num_sents=10,max_sent_length=8,little_word_pr
             current_sent.append(little_word_choice)
         for word_count in range(max_sent_length):
             while cur_word == prev_word:
-                cur_word = random.choice(words)
-            while cur_pos == prev_pos:
-                cur_pos = random.choice(POS)
+                cur_word,cur_pos = random.choice(words)
             prev_word = cur_word
             prev_pos = cur_pos
             cur_word_conj = apply_morphology(cur_word,cur_pos,defs_and_morphemes)
@@ -297,31 +245,32 @@ def create_fake_text(lang_template,num_sents=10,max_sent_length=8,little_word_pr
         text.append(random.choice(PUNCTUATION))
     return " ".join(text)
 
+
 if __name__ == "__main__":
-    """
+
     for lang_name, max_syl in [("lang01",3)]:#("lang02",3),("lang03",1),("lang04",4)]:
         print("Creating language from {} template".format(lang_name))
         phon_csv = "{}_phonology.csv".format(lang_name)
         morph_csv = "{}_morphology.csv".format(lang_name)
         phon_filename = os.path.join(CONSTRAINTS_DIR,phon_csv)
         morph_filename = os.path.join(CONSTRAINTS_DIR,morph_csv)
-        defs_and_words = create_words(phon_filename,max_syls=max_syl)
-        for definition, word in defs_and_words:
-            print("{}: {}".format(definition, word))
+        defs_words_tags = create_words(phon_filename,WORD_LIST_FNAME,max_syls=max_syl)
+        for definition, word,tag in defs_words_tags:
+            print("{}: {} ({})".format(definition, word,tag))
         print()
 
         print("Creating morphemes:")
-        defs_and_morphemes = create_morphemes(defs_and_words, phon_filename,morph_filename,max_syls=1)
+        defs_and_morphemes = create_morphemes(defs_words_tags, phon_filename,morph_filename,max_syls=1)
         for definition, morpheme in defs_and_morphemes:
             print("{}: {}".format(definition, morpheme))
         print()
-    """
 
-    """
+
+
     print("Writing language template:")
     template_fname = os.path.join(CONSTRAINTS_DIR,"{}_template.csv".format(lang_name))
-    write_language_template(defs_and_words,defs_and_morphemes,template_fname)
-    """
+    write_language_template(defs_words_tags,defs_and_morphemes,template_fname)
+
 
     print("Creating sample text:")
     fake_text = create_fake_text(os.path.join(CONSTRAINTS_DIR,"lang01_template.csv"))
