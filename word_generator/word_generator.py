@@ -28,7 +28,7 @@ LITTLE_WORDS = [
 "go","an","wa","so","te","heo"
 ]
 
-PUNCTUATION = [".",",","!","?"]
+PUNCTUATION = [".",","]
 
 def load_phon_template(phon_csv):
     """Load phonology from csv"""
@@ -356,6 +356,10 @@ if __name__ == "__main__":
     #print()
 
     text, trans = create_real_text(template_fname)
-    print(text)
+    text_sents = text.split(".")
+    trans_sents = trans.split(".")
+    for i in range(len(text_sents)):
+        print(text_sents[i])
+        print(trans_sents[i])
+        print()
     print()
-    print(trans)
