@@ -153,17 +153,21 @@ def write_language_template(defs_words_tags, defs_and_morphemes,dest_fname):
 def apply_morphology(word,pos,defs_and_morphemes):
     """Apply morphology to word"""
     word_conj = ""
+    gloss = []
     if pos == "n":
         n_prefixes = [
-            morpheme for definition, morpheme in defs_and_morphemes
+            (definition, morpheme) for definition, morpheme in defs_and_morphemes
             if definition.startswith("prep_")
         ]
         n_suffixes = [
-            morpheme for definition, morpheme in defs_and_morphemes
+            (definition, morpheme) for definition, morpheme in defs_and_morphemes
             if definition.startswith("n_")
         ]
-        noun_prefix = random.choice(n_prefixes)
-        noun_suffix = random.choice(n_suffixes)
+        prefix_def, noun_prefix = random.choice(n_prefixes)
+        suffix_def, noun_suffix = random.choice(n_suffixes)
+        gloss.append(prefix_def)
+        gloss.append(suffix_def)
+
         word_conj = "{}-{}-{}".format(noun_prefix,word,noun_suffix)
 
     elif pos == "v":
@@ -176,26 +180,29 @@ def apply_morphology(word,pos,defs_and_morphemes):
         aspect = list()
         other_v_suffix = list()
         for definition, morpheme in verb_morphemes:
-            if "agr" in definition: agr.append(morpheme)
-            elif "aspect" in definition: aspect.append(morpheme)
-            elif "tense" in definition: tense.append(morpheme)
-            else: other_v_suffix.append(morpheme)
-        v_agr = random.choice(agr)
-        v_aspect = random.choice(aspect)
-        v_tense = random.choice(tense)
-        v_suffix = random.choice(other_v_suffix)
+            if "agr" in definition: agr.append((definition, morpheme))
+            elif "aspect" in definition: aspect.append((definition, morpheme))
+            elif "tense" in definition: tense.append((definition, morpheme))
+            else: other_v_suffix.append((definition, morpheme))
+        agr_def, v_agr = random.choice(agr)
+        aspect_def, v_aspect = random.choice(aspect)
+        tense_def, v_tense = random.choice(tense)
+        suffix_def, v_suffix = random.choice(other_v_suffix)
+
         word_conj = "{}-{}-{}-{}".format(v_agr,v_aspect,word,v_tense,v_suffix)
+        gloss.extend([agr_def, aspect_def, tense_def, suffix_def])
 
     elif pos == "a":
         adj_morphemes = [
-            morpheme for definition, morpheme in defs_and_morphemes
+            (definition, morpheme) for definition, morpheme in defs_and_morphemes
             if definition.startswith("a_")
         ]
-        adj_suffix = random.choice(adj_morphemes)
+        suffix_def, adj_suffix = random.choice(adj_morphemes)
         word_conj = "{}-{}".format(word,adj_suffix)
+        gloss.append(suffix_def)
     else:
         word_conj = word
-    return word_conj
+    return word_conj,gloss
 
 def random_little_word(little_word_proportion):
     """Randomly add little words based on desired proportion"""
@@ -219,6 +226,7 @@ def create_real_text(lang_template,num_sents=10):
                 words.append((row["Meaning"],row["Word"],row["Tag"]))
             else:
                 defs_and_morphemes.append((row["Meaning"],row["Word"]))
+
     nouns = [
         word for word in words if word[2] == "n"
     ]
@@ -240,25 +248,34 @@ def create_real_text(lang_template,num_sents=10):
         current_sent = list()
         obj = random.choice(nouns)
         obj_def = obj[0].replace("w_","")
-        obj_word = obj[1]
+        obj_word = obj[1].replace("n_","")
         obj_tag = obj[2]
 
         adj = random.choice(adjectives)
         adj_def = adj[0].replace("w_","")
-        adj_word = adj[1]
+        adj_word = adj[1].replace("a_","")
         adj_tag = adj[2]
 
         verb = random.choice(verbs)
         verb_def = verb[0].replace("w_","")
-        verb_word = verb[1]
+        verb_word = verb[1].replace("v_","")
         verb_tag = verb[2]
 
-        obj_conj = apply_morphology(obj_word,obj_tag,defs_and_morphemes)
-        adj_conj = apply_morphology(adj_word,adj_tag,defs_and_morphemes)
-        verb_conj = apply_morphology(verb_word,verb_tag,defs_and_morphemes)
+        obj_conj,gloss = apply_morphology(obj_word,obj_tag,defs_and_morphemes)
+        obj_gloss = "-".join([item for item in gloss])
+
+        adj_conj,gloss = apply_morphology(adj_word,adj_tag,defs_and_morphemes)
+        adj_gloss = "-".join([item for item in gloss])
+
+        verb_conj,gloss = apply_morphology(verb_word,verb_tag,defs_and_morphemes)
+        verb_gloss = "-".join([item for item in gloss])
+
+        verb_def_gloss = verb_def + "-" + verb_gloss.replace("v_","")
+        adj_def_gloss = adj_def + "-" + adj_gloss.replace("a_","")
+        obj_def_gloss = obj_def + "-" + obj_gloss.replace("n_","")
 
         current_sent = [verb_conj, obj_conj, adj_conj]
-        current_translation = [verb_def, adj_def, obj_def]
+        current_translation = [verb_def_gloss, adj_def_gloss, obj_def_gloss]
         text.extend(current_sent)
         translation.extend(current_translation)
         punct = random.choice(PUNCTUATION)
