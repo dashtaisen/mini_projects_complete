@@ -363,6 +363,7 @@ if __name__ == "__main__":
     trans_sents = trans.split(".")
     for i in range(len(text_sents)):
         print(text_sents[i])
+        print()
         print(trans_sents[i])
         print()
     print()

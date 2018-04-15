@@ -1,0 +1,47 @@
+\documentclass[12]{article}
+ 
+\usepackage[left=1in, top=1in, right=1in, bottom=1in,
+marginparwidth=.5in]{geometry}
+\usepackage{setspace}
+\doublespacing
+\usepackage{natbib}
+\setlength{\bibsep}{0.0pt}
+\usepackage{graphicx}
+\usepackage [autostyle, english = american]{csquotes}
+\MakeOuterQuote{"}
+
+%dependencies
+\usepackage{tikz-dependency}
+
+%Single spacing inside verbatim
+\makeatletter
+\def\verbatim@font{\linespread{1}\normalfont\ttfamily}
+\makeatother
+
+\usepackage{lipsum}
+\usepackage{gb4e}
+\makeatletter
+\apptocmd{\gl@stop}{\nobreak}{}{}
+\makeatother
+\noautomath
+
+
+
+\begin{document}
+
+
+\begin{exe}
+\ex \label{ex:eating_thing}
+\gll kaj-rao-sunnier-uil mul-finsoi oumfen-dol \\
+  4-\textsc{impf}-eat-\textsc{fut} until-here that-\textsc{inst} \\
+\trans `That’s (the utensil) that people will be eating with until now’
+\end{exe}
+
+\begin{exe}
+\ex \label{ex:gross_bread}
+\gll men-hiom-uil-hier nienful-niu oumfen-daj \\
+\textsc{1s}-get-\textsc{fut}-\textsc{riddance} bread-\textsc{acc} that-\textsc{aug} \\
+\glt `I'll get that huge gross piece of bread (so that you don't have to deal with it)'
+\end{exe}
+
+\end{document}
