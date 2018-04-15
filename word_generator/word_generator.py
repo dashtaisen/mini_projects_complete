@@ -278,7 +278,7 @@ def create_real_text(lang_template,num_sents=10):
         obj_def_gloss = obj_gloss.replace("n_","")
 
         current_sent = [verb_conj, obj_conj, adj_conj]
-        current_translation = [verb_def_gloss, adj_def_gloss, obj_def_gloss]
+        current_translation = [verb_def_gloss, obj_def_gloss, adj_def_gloss]
         text.extend(current_sent)
         translation.extend(current_translation)
         punct = random.choice(PUNCTUATION)
