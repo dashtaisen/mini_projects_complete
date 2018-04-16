@@ -5,6 +5,8 @@ How to run:
 Look at lang01_mophology and lang01_phonology, and wordlist csv files,
 to see how the constraints are set up
 
+You can also look at lang03. lang02 and lang04 aren't done yet.
+
 To run on the lang01 templates, just run at the command line:
 
 python word_generator.py
@@ -106,6 +108,8 @@ def create_words(phon_csv,word_csv,max_syls = 4):
     for definition,tag in defs_and_tags:
         word = None
         current_word_parts = list()
+
+        # Loop to avoid homophones
         while word is None or word in created_words:
             num_syls = random.randint(1,max_syls)
             for syl in range(num_syls):
@@ -162,6 +166,8 @@ def create_morphemes(defs_words_tags, phon_csv,morph_csv,max_syls=1):
     for morph_meaning in morph_meanings:
         morpheme = None
         current_morpheme_parts = list()
+
+        # Loop to avoid homophones
         while morpheme is None or morpheme in existing_words or morpheme in morphemes:
             num_syls = random.randint(0,max_syls)
             for syl in range(num_syls):
