@@ -5,8 +5,6 @@ How to run:
 Look at lang01_mophology and lang01_phonology, and wordlist csv files,
 to see how the constraints are set up
 
-You can also look at lang03. lang02 and lang04 aren't done yet.
-
 To run on the lang01 templates, just run at the command line:
 
 python word_generator.py
@@ -423,7 +421,7 @@ def create_text(lang_template,num_sents=10):
 
 
 if __name__ == "__main__":
-    
+
     print("Creating language from {} template".format(LANG_NAME))
     phon_csv = "{}_phonology.csv".format(LANG_NAME)
     morph_csv = "{}_morphology.csv".format(LANG_NAME)
