@@ -228,7 +228,8 @@ def apply_morphology(word,word_def,pos,defs_and_morphemes):
         ]
         time_def, time_morph = random.choice(time_postpositions)
         gloss.append(word_def)
-        gloss.append(time_def)
+        # Split at _ and take the last item to just get the prep meaning
+        gloss.append(time_def.split("_")[-1])
         word_conj = "{}-{}".format(word,time_morph)
 
     elif pos == "loc":
@@ -238,7 +239,8 @@ def apply_morphology(word,word_def,pos,defs_and_morphemes):
         ]
         loc_def, loc_morph = random.choice(loc_postpositions)
         gloss.append(word_def)
-        gloss.append(loc_def)
+        # Split at _ and take the last item to just get the prep meaning
+        gloss.append(loc_def.split("_")[-1])
         word_conj = "{}-{}".format(word,loc_morph)
 
     elif pos == "n":
@@ -421,7 +423,7 @@ def create_text(lang_template,num_sents=10):
 
 
 if __name__ == "__main__":
-
+    
     print("Creating language from {} template".format(LANG_NAME))
     phon_csv = "{}_phonology.csv".format(LANG_NAME)
     morph_csv = "{}_morphology.csv".format(LANG_NAME)
@@ -443,6 +445,8 @@ if __name__ == "__main__":
     template_fname = os.path.join(CONSTRAINTS_DIR,"{}_template.csv".format(LANG_NAME))
     write_language_template(defs_words_tags,defs_and_morphemes,template_fname)
 
+
+    #template_fname = os.path.join(CONSTRAINTS_DIR,"{}_template_saved.csv".format(LANG_NAME))
 
     print("Creating sample text:")
     text, trans = create_text(template_fname)
